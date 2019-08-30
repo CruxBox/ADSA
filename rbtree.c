@@ -1,15 +1,23 @@
 #include<stdio.h>
+#include<stdlib.h>
 
 enum color {red,black};
 
 typedef struct Node{
 	int val;
 	int col;
-	node* parent;
-	node* left;
-	node* right;
+	struct Node* parent;
+	struct Node* left;
+	struct Node* right;
 }node;
 
+void swap(int* a, int* b){
+	int t;
+	t = *a;
+	*a = *b;
+	*b = t;
+
+}
 node* root = NULL;
 
 void setColor(node* x, int col){
@@ -21,7 +29,7 @@ int getColor(node* x){
 void fixinsert();
 
 node* makenode(int val){
-	node* temp = malloc(sizeof(node));
+	node* temp = (node*)malloc(sizeof(node));
 	temp->col = red;
 	temp->val = val;
 	temp->parent = temp->right = temp->left = NULL;
@@ -46,7 +54,7 @@ void left_rotate(node* parent){
 			grandparent->right = right;
 		}
 		else
-			grandparent->left = left;
+			grandparent->left = right;
 	}
 	else root = right;
 
@@ -78,9 +86,10 @@ left_right->parent = ptr;
 
 void fixinsert(node* ptr){
 
-	while(getColor(ptr)==red && ptr!=root && getColor(parent)==red){
 	node* parent = ptr->parent;
 	node* grandparent = parent->parent;
+
+	while(getColor(ptr)==red && ptr!=root && getColor(parent)==red){
 
 		if(parent == grandparent->left){
 			node* uncle = grandparent->right;
@@ -98,7 +107,7 @@ void fixinsert(node* ptr){
 					parent = ptr->parent;
 				}
 				//right rotate the grandparent,swao colors of g and p and change ptr
-				swap(grandparent->col, parent->col);
+				swap(&grandparent->col, &parent->col);
 				right_rotate(grandparent);
 				ptr = parent;
 			}
@@ -119,28 +128,34 @@ void fixinsert(node* ptr){
 					parent = parent->left;
 				}
 				//left rotate the grandparent and swap colors of g and p and change ptr
-				swap(grandparent->col, parent->col);
+				swap(&grandparent->col, &parent->col);
 				left_rotate(grandparent);
 				ptr = parent;
 			}	
 		}
+	node* parent = ptr->parent;
+	node* grandparent = parent->parent;
 	}
 	setColor(root,black);
 }
 
 void insert(node* subroot, node* x){
 
-	if(subroot == NULL) subroot = x;
-	else if(subroot->val >= x->val){
+	if(subroot == NULL) subroot = x,fixinsert(subroot);
+	else if(subroot->val > x->val){
 		insert(subroot->left, x);
 		subroot->left->parent = subroot;
-		fixinsert(ptr);
 	}
 	else if(subroot->val <x->val){
 		insert(subroot->right, x);
 		subroot->right->parent = subroot;
-		fixinsert(ptr);
 	}
+}
+void inorder(node* root){
+	if(root == NULL) return ;
+	inorder(root->left);
+	printf("val: %d, col: %d\n",root->val,root->col);
+	inorder(root->right);
 }
 
 int main(){
@@ -153,4 +168,6 @@ int main(){
 		temp = makenode(a);
 		insert(root,temp);
 	}
+
+	inorder(root);
 }
