@@ -27,12 +27,40 @@ node* makenode(int val){
 	temp->parent = temp->right = temp->left = NULL;
 	return temp;
 }
+void left_rotate(node* parent){
+	node* right = parent->right;
+	node* right_left = right->left;
+
+	node* grandparent = parent->parent;
+	
+	parent->right = right_left;
+	
+	if(right_left != NULL){
+		right_left->parent = parent;	
+	}
+
+	right->parent = grandparent;
+	
+	if(grandparent != NULL){
+		if(parent == grandparent->right){
+			grandparent->right = right;
+		}
+		else
+			grandparent->left = left;
+	}
+	else root = right;
+
+	parent->parent = right;
+
+}
+
 
 void fixinsert(node* ptr){
 
 	while(getColor(ptr)==red && ptr!=root && getColor(parent)==red){
 	node* parent = ptr->parent;
 	node* grandparent = parent->parent;
+
 		if(parent == grandparent->left){
 			node* uncle = grandparent->right;
 			if(getColor(uncle) == red){
@@ -44,6 +72,9 @@ void fixinsert(node* ptr){
 			else{
 				if(ptr == parent->right){
 					//left rotate the parent and change pointers
+					left_rotate(parent);
+					ptr = parent;
+					parent = ptr->parent;
 				}
 				//right rotate the grandparent and swap colors of g and p
 			}
