@@ -54,6 +54,27 @@ void left_rotate(node* parent){
 
 }
 
+void right_rotate(node* ptr){
+
+node* left = ptr->left;
+node* g_grandparent = ptr->parent;
+node* left_right = left->right;
+
+left->parent = g_grandparent;
+if(g_grandparent != NULL)
+{
+	if(g_grandparent->right == ptr)
+		g_grandparent->right = left;
+	else 
+		g_grandparent->left = left;
+}
+ptr->left = left_right;
+ptr->parent = left;
+left->right = ptr;
+left_right->parent = ptr;
+
+}
+
 
 void fixinsert(node* ptr){
 
@@ -76,7 +97,10 @@ void fixinsert(node* ptr){
 					ptr = parent;
 					parent = ptr->parent;
 				}
-				//right rotate the grandparent and swap colors of g and p
+				//right rotate the grandparent,swao colors of g and p and change ptr
+				swap(grandparent->col, parent->col);
+				right_rotate(grandparent);
+				ptr = parent;
 			}
 		}
 		else{
@@ -90,8 +114,14 @@ void fixinsert(node* ptr){
 			else{
 				if(ptr == parent->left){
 					//right rotate the parent and change pointers
+					right_rotate(parent);
+					ptr = parent;
+					parent = parent->left;
 				}
-				//left rotate the grandparent and swap colors of g and p
+				//left rotate the grandparent and swap colors of g and p and change ptr
+				swap(grandparent->col, parent->col);
+				left_rotate(grandparent);
+				ptr = parent;
 			}	
 		}
 	}
