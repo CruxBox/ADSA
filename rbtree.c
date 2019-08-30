@@ -16,17 +16,19 @@ void swap(int* a, int* b){
 	t = *a;
 	*a = *b;
 	*b = t;
-
 }
+
 node* root = NULL;
 
 void setColor(node* x, int col){
+	if(x == NULL) return;
 	x->col = col;
 }
+
 int getColor(node* x){
+	if(x == NULL) return black;
 	return x->col;
 }
-void fixinsert();
 
 node* makenode(int val){
 	node* temp = (node*)malloc(sizeof(node));
@@ -35,22 +37,20 @@ node* makenode(int val){
 	temp->parent = temp->right = temp->left = NULL;
 	return temp;
 }
-void left_rotate(node* parent){
-	node* right = parent->right;
-	node* right_left = right->left;
+void left_rotate(node** parent){
 
-	node* grandparent = parent->parent;
-	
-	parent->right = right_left;
-	
-	if(right_left != NULL){
-		right_left->parent = parent;	
+	node* grandparent = (*parent)->parent;
+	node* right = (*parent)->right;
+	(*parent)->right = right->left;
+		
+	if(right->left != NULL){
+		right->left->parent = *parent;	
 	}
 
 	right->parent = grandparent;
 	
 	if(grandparent != NULL){
-		if(parent == grandparent->right){
+		if(*parent == grandparent->right){
 			grandparent->right = right;
 		}
 		else
@@ -58,58 +58,60 @@ void left_rotate(node* parent){
 	}
 	else root = right;
 
-	parent->parent = right;
+	right->left = *parent;
+	(*parent)->parent = right;
 
 }
 
-void right_rotate(node* ptr){
+void right_rotate(node** ptr){
 
-node* left = ptr->left;
-node* g_grandparent = ptr->parent;
+node* left = (*ptr)->left;
+node* grandparent = (*ptr)->parent;
 node* left_right = left->right;
 
-left->parent = g_grandparent;
-if(g_grandparent != NULL)
+left->parent = grandparent;
+if(grandparent != NULL)
 {
-	if(g_grandparent->right == ptr)
-		g_grandparent->right = left;
+	if(grandparent->right == *ptr)
+		grandparent->right = left;
 	else 
-		g_grandparent->left = left;
+		grandparent->left = left;
 }
-ptr->left = left_right;
-ptr->parent = left;
-left->right = ptr;
-left_right->parent = ptr;
+(*ptr)->left = left_right;
+(*ptr)->parent = left;
+left->right = *ptr;
 
+if(left_right!=NULL)
+	left_right->parent = *ptr;
 }
 
 
-void fixinsert(node* ptr){
+void fixinsert(node** ptr){
 
-	node* parent = ptr->parent;
-	node* grandparent = parent->parent;
+	node* parent = (*ptr)->parent;
 
-	while(getColor(ptr)==red && ptr!=root && getColor(parent)==red){
+	while(getColor(*ptr)==red && *ptr!=root && getColor(parent)==red){
 
+		node* grandparent = parent->parent;
 		if(parent == grandparent->left){
 			node* uncle = grandparent->right;
 			if(getColor(uncle) == red){
 				setColor(uncle,black);
 				setColor(parent,black);
 				setColor(grandparent,red);
-				ptr=grandparent;
+				*ptr=grandparent;
 			}
 			else{
-				if(ptr == parent->right){
+				if(*ptr == parent->right){
 					//left rotate the parent and change pointers
-					left_rotate(parent);
-					ptr = parent;
-					parent = ptr->parent;
+					left_rotate(&parent);
+					*ptr = parent;
+					parent = (*ptr)->parent;
 				}
 				//right rotate the grandparent,swao colors of g and p and change ptr
 				swap(&grandparent->col, &parent->col);
-				right_rotate(grandparent);
-				ptr = parent;
+				right_rotate(&grandparent);
+				*ptr = parent;
 			}
 		}
 		else{
@@ -118,25 +120,23 @@ void fixinsert(node* ptr){
 				setColor(uncle,black);
 				setColor(parent,black);
 				setColor(grandparent,red);
-				ptr=grandparent;
+				*ptr=grandparent;
 			}
 			else{
-				if(ptr == parent->left){
+				if(*ptr == parent->left){
 					//right rotate the parent and change pointers
-					right_rotate(parent);
-					ptr = parent;
-					parent = parent->left;
+					right_rotate(&parent);
+					*ptr = parent;
+					parent = (*ptr)->parent;
 				}
 				//left rotate the grandparent and swap colors of g and p and change ptr
 				swap(&grandparent->col, &parent->col);
-				left_rotate(grandparent);
-				ptr = parent;
+				left_rotate(&grandparent);
+				*ptr = parent;
 			}	
 		}
-	node* parent = ptr->parent;
-	node* grandparent = parent->parent;
+	parent = (*ptr)->parent;
 	}
-	setColor(root,black);
 }
 
 void insert(node** subroot, node** x){
@@ -167,6 +167,8 @@ int main(){
 		scanf("%d",&a);
 		temp = makenode(a);
 		insert(&root,&temp);
+		fixinsert(&temp);
+		setColor(root,black);
 	}
 
 	inorder(root);
