@@ -139,16 +139,16 @@ void fixinsert(node* ptr){
 	setColor(root,black);
 }
 
-void insert(node* subroot, node* x){
+void insert(node** subroot, node** x){
 
-	if(subroot == NULL) subroot = x,fixinsert(subroot);
-	else if(subroot->val > x->val){
-		insert(subroot->left, x);
-		subroot->left->parent = subroot;
+	if(*subroot == NULL) (*subroot) = *x;
+	else if((*subroot)->val > (*x)->val){
+		insert(&(*subroot)->left, x);
+		(*subroot)->left->parent = (*subroot);
 	}
-	else if(subroot->val <x->val){
-		insert(subroot->right, x);
-		subroot->right->parent = subroot;
+	else if((*subroot)->val <(*x)->val){
+		insert(&(*subroot)->right, x);
+		(*subroot)->right->parent = (*subroot);
 	}
 }
 void inorder(node* root){
@@ -166,7 +166,7 @@ int main(){
 	for(int i=0;i<n;i++){
 		scanf("%d",&a);
 		temp = makenode(a);
-		insert(root,temp);
+		insert(&root,&temp);
 	}
 
 	inorder(root);
