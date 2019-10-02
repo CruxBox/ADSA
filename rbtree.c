@@ -159,11 +159,11 @@ void inorder(node* root){
 }
 
 int main(){
-	int n;
-	scanf("%d",&n);
+	int num;
+	scanf("%d",&num);
 	int a;
 	node* temp;
-	for(int i=0;i<n;i++){
+	for(int i=0;i<num;i++){
 		scanf("%d",&a);
 		temp = makenode(a);
 		insert(&root,&temp);
