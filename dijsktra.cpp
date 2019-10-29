@@ -9,10 +9,13 @@ class Graph{
 
 	int V;
 	vector<pair<int,int> > *adj;
+	vector<int> minheap;
+	int minsize;
 public:
 	Graph(int v){
 		V = v;
 		adj = new vector<pair<int,int> >[V];
+		minsize = V;
 	}
 
 	void addEdge(int u, int v,int w){
@@ -20,21 +23,23 @@ public:
 		adj[v].push_back(make_pair(u,w));
 	}
 
-	void solve(int source){
+	void solve(){
 	
 		int dist[V];
 		bool vis[V];
 		forall(V){
 			vis[i] = false;
 			dist[i] = INF;
+			minheap.push_back(dist[i]);
 		}
 		dist[source] = 0;
+		minheap[source] = 0;
 
 		queue<int> q;
 
 		q.push(source);
 
-		while(q.size()){
+		while(){
 			int u = q.front();
 			q.pop();
 			vis[u] = 1;
@@ -58,8 +63,7 @@ int main(){
 
 	int n,m;
 	cin>>n>>m;
-	int s;
-	cin>>s;
+
 	Graph g(n+1);
 
 	int x,y,z;
@@ -68,6 +72,6 @@ int main(){
 		g.addEdge(x,y,z);
 	}
 
-	g.solve(s);
+	g.solve();
 
 }
